@@ -18,9 +18,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-lead_index = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
+text_dict = json.loads(os.getenv("LABELS_DICT"))
+lead_index = os.getenv("LEAD_INDEX").split(",")
 
-def plot_v3(
+def plot_ecg_multilead(
         ecg, 
         full_ecg_name,        # changed to let us have (or don't have) full ecg in the printed format
         full_ecg,             # changed
@@ -228,7 +229,7 @@ def plot_v3(
     return output_log   
 
 
-def save_as_jpg(save_path, dpi):
+def save_figure_as_jpg(save_path, dpi):
     """Plot multi lead ECG chart.
     # Arguments
         file_name: file_name
@@ -240,10 +241,8 @@ def save_as_jpg(save_path, dpi):
 
 
 
-# breakpoint()
-text_dict = json.loads(os.getenv("labels_dict"))
 
-def determine_bb(*, sample: dict, mode:str, save_bb_path: str, img_array):
+def generate_bounding_boxes(*, sample: dict, mode:str, save_bb_path: str, img_array):
     """"
     Determine the bounding box; it received logs of a sample, but the imgae was loaded before calling this function.
     Input format: 
@@ -362,7 +361,7 @@ def draw_bb(sample: dict, export_path: str):
     img_height = img_size[0]
 
     plt.imshow(img)
-    for _, x, y, w, h in determine_bb(sample=sample, mode='load_image', save_bb_path=None, img_array=None):
+    for _, x, y, w, h in generate_bounding_boxes(sample=sample, mode='load_image', save_bb_path=None, img_array=None):
         lead_width = w*img_width
         lead_height = h*img_height
         plt.gca().add_patch(plt.Rectangle((x*img_width-lead_width/2, y*img_height-lead_height/2),\
@@ -371,7 +370,7 @@ def draw_bb(sample: dict, export_path: str):
     plt.savefig(export_path, dpi=300)
     plt.close()
 
-def crop_bb(sample:dict, export_path:str, img_path:str, prefix:str="", smaple_number:int=None, save_bmp:bool=False):
+def crop_lead_images(sample:dict, export_path:str, img_path:str, prefix:str="", smaple_number:int=None, save_bmp:bool=False):
     """
     Loads an image using img_path. Then, finds the leads using sample, crops them and saves it to the export path
     Input format:
@@ -393,7 +392,7 @@ def crop_bb(sample:dict, export_path:str, img_path:str, prefix:str="", smaple_nu
     lead_number = 0
     out = []
 
-    bbs_info = determine_bb(sample=sample, mode='load_image', save_bb_path=None, img_array=None)
+    bbs_info = generate_bounding_boxes(sample=sample, mode='load_image', save_bb_path=None, img_array=None)
     if not isinstance(smaple_number, type(None)):
         if sample['leads'][0]['text']:   # if we have show_lead_name, then this value is true and we have twice bounding boxes (each lead have one bb for text and one for lead)
             bbs_info = [bbs_info[2*smaple_number]]
@@ -423,7 +422,7 @@ def crop_bb(sample:dict, export_path:str, img_path:str, prefix:str="", smaple_nu
     return out
 
 
-def get_indices_information(start_index, lead_config, number_each_lead):
+def generate_split_indices(start_index, lead_config, number_each_lead):
     out = []
     idx = start_index
     for i in range(number_each_lead):
@@ -436,7 +435,7 @@ if __name__ == "__main__":
     log_path = "datasets/image_dataset_v4.0/detection/train/"
     with open(f"{log_path}logs.json", 'r') as f:
         logs = json.load(f)
-    # determine_bb(sample=logs['samples'][1], mode='load_image', save_bb_path=None, img_array=None)
+    # generate_bounding_boxes(sample=logs['samples'][1], mode='load_image', save_bb_path=None, img_array=None)
     for i in range(4):
         draw_bb(logs['samples'][i], f"{i}.jpg")
 
