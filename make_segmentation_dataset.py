@@ -103,31 +103,32 @@ border:int = 34         # it's the white border in down left of the image that s
 
 dataset_path = f'{os.getenv("datasets_path")}image_dataset_v{dataset_version}.0'
 
+path_to_detection_dataset = f'{dataset_path}/detection/'
 path_to_segmentation_dataset = f'{dataset_path}/segmentation/'
-path_to_digitization_dataset = f'{dataset_path}/digitization/'
 path_to_temp_dir = f'{dataset_path}/temp/'
 
-for p in [path_to_segmentation_dataset, path_to_digitization_dataset, path_to_temp_dir]:
+for p in [path_to_detection_dataset, path_to_segmentation_dataset, path_to_temp_dir]:
     if os.path.exists(p):
         shutil.rmtree(p)   # remove the directory
 
+os.makedirs(path_to_detection_dataset)
 os.makedirs(path_to_segmentation_dataset)
-os.makedirs(path_to_digitization_dataset)
 os.makedirs(path_to_temp_dir)
 
 # Create child directories: test, train, val
 for folder in ["train", "test", "val"]:
     os.makedirs(os.path.join(path_to_segmentation_dataset, folder))
-    os.makedirs(os.path.join(path_to_digitization_dataset, folder))
     
-    os.makedirs(os.path.join(path_to_segmentation_dataset, folder, "images"))
-    os.makedirs(os.path.join(path_to_digitization_dataset, folder, "images"))
+    os.makedirs(os.path.join(path_to_detection_dataset, folder, "images"))
+    os.makedirs(os.path.join(path_to_detection_dataset, folder, "labels"))
 
-    os.makedirs(os.path.join(path_to_segmentation_dataset, folder, "labels"))
-    os.makedirs(os.path.join(path_to_digitization_dataset, folder, "labels"))
+    os.makedirs(os.path.join(path_to_segmentation_dataset, folder, "image"))
+    os.makedirs(os.path.join(path_to_segmentation_dataset, folder, "mask-png"))
+    os.makedirs(os.path.join(path_to_segmentation_dataset, folder, "mask-bmp"))
+    os.makedirs(os.path.join(path_to_segmentation_dataset, folder, "signal-json"))
 
+print(f'directory {path_to_detection_dataset} created.')
 print(f'directory {path_to_segmentation_dataset} created.')
-print(f'directory {path_to_digitization_dataset} created.')
 
 
 row_height = 3
@@ -153,21 +154,30 @@ for data_pack, dtset_type in [(train_indices, "train"), (test_indices, "test"), 
     for idx, lead_format, each_lead_config in data_pack:
         print(dtset_type, idx)
         sample_name = str(idx)+'_'+lead_format
+        detection_export_path = os.path.join(path_to_detection_dataset, dtset_type)
         segmentation_export_path = os.path.join(path_to_segmentation_dataset, dtset_type)
-        digitization_export_path = os.path.join(path_to_digitization_dataset, dtset_type)
 
         plt.close("all")
 
         image_temp_path = path_to_temp_dir
-        image_path = os.path.join(image_temp_path, sample_name+".jpg")
         blackwhite_path = os.path.join(image_temp_path, sample_name+"-bw.jpg")
 
-        segmentation_input_path = os.path.join(segmentation_export_path, "images")
-        segmentation_output_path = os.path.join(segmentation_export_path, "labels")
+        detection_input_path = os.path.join(detection_export_path, "images")
+        detection_output_path = os.path.join(detection_export_path, "labels")
 
-        digitization_input_path = os.path.join(digitization_export_path, "images")
-        digitization_output_path = os.path.join(digitization_export_path, "labels")
+        segmentation_image_path = os.path.join(segmentation_export_path, "image")
+        segmentation_mask_png_path = os.path.join(segmentation_export_path, "mask-png")
+        segmentation_mask_bmp_path = os.path.join(segmentation_export_path, "mask-bmp")
+        segmentation_signal_path = os.path.join(segmentation_export_path, "signal-json")
 
+
+        image_detection_sample = os.path.join(detection_input_path, sample_name+".jpg")
+        label_detection_sample = os.path.join(detection_output_path, sample_name+".txt")
+
+        # image_segmentation_sample = os.path.join(segmentation_image_path, sample_name+".jpg")
+        mask_png_segmentation_sample = os.path.join(segmentation_mask_png_path, sample_name+".png")
+        mask_bmp_segmentation_sample = os.path.join(segmentation_mask_bmp_path, sample_name+".bmp")
+        signal_segmentation_sample = os.path.join(segmentation_signal_path, sample_name+".json")
 
         log = plot_v3(
             ecg=X[idx, :each_lead_config['length'], :each_lead_config['n_leads']].T,
@@ -183,7 +193,7 @@ for data_pack, dtset_type in [(train_indices, "train"), (test_indices, "test"), 
             show_separate_line=False,
             row_height=row_height,
             style=None,
-            save_path=image_path,
+            save_path=image_detection_sample,
             dpi=dpi)
 
         log['padding_x'] = padding_x
@@ -194,9 +204,10 @@ for data_pack, dtset_type in [(train_indices, "train"), (test_indices, "test"), 
         fig = plt.gcf()
         fig.canvas.draw()
         image_array = np.array(fig.canvas.renderer._renderer)
-        save_as_jpg(image_path, dpi=dpi)
+        save_as_jpg(image_detection_sample, dpi=dpi)
 
-        crop_bb(sample=log, export_path=segmentation_input_path, img_path=image_path, prefix=sample_name+"_")
+        crop_bb(sample=log, export_path=segmentation_image_path, img_path=image_detection_sample, prefix=sample_name+"_")
+        determine_bb(sample=log, mode='online', save_bb_path=label_detection_sample, img_array=image_array)
 
         for lead_number in range(each_lead_config['n_leads']+1):
             if lead_number==each_lead_config['n_leads']:
@@ -233,10 +244,10 @@ for data_pack, dtset_type in [(train_indices, "train"), (test_indices, "test"), 
             bw_array = np.array(fig.canvas.renderer._renderer)
             save_as_jpg(blackwhite_path, dpi=dpi)
 
-            crop_bb(sample=log, export_path=segmentation_output_path, img_path=blackwhite_path, prefix=sample_name+"_", smaple_number=lead_number, save_bmp=True)
-            crop_bb(sample=log, export_path=digitization_input_path, img_path=blackwhite_path, prefix=sample_name+"_", smaple_number=lead_number)
+            crop_bb(sample=log, export_path=segmentation_mask_bmp_path, img_path=blackwhite_path, prefix=sample_name+"_", smaple_number=lead_number, save_bmp=True)
+            crop_bb(sample=log, export_path=segmentation_mask_png_path, img_path=blackwhite_path, prefix=sample_name+"_", smaple_number=lead_number)
 
-            with open(os.path.join(digitization_output_path, f"{sample_name}_lead_{lead_number}.json"), 'w') as f:
+            with open(os.path.join(segmentation_signal_path, f"{sample_name}_lead_{lead_number}.json"), 'w') as f:
                 json.dump(log['leads'][lead_number]['ecg'], f)
             
             # bw_to_yolo(os.path.join(digitization_input_path, f"{sample_name}_lead_{lead_number}.png"), os.path.join(segmentation_output_path, f"{sample_name}_lead_{lead_number}.txt"))
