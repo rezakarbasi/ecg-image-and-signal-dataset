@@ -4,59 +4,57 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 import os
-from math import ceil 
-# import random
-
-import os
-import numpy as np
-import json
-import matplotlib.pyplot as plt
-# import cv2
+from math import ceil
 import json
 from PIL import Image
 from dotenv import load_dotenv
 
+# ---------------------- ENVIRONMENT LOADING ----------------------
 load_dotenv()
 
-text_dict = json.loads(os.getenv("LABELS_DICT"))
-lead_index = os.getenv("LEAD_INDEX").split(",")
+# Load constants from environment or use defaults
+text_dict = json.loads(os.getenv("LABELS_DICT", '{"I":1, "II":2, "III":3, "aVR":4, "aVL":5, "aVF":6, "V1":7, "V2":8, "V3":9, "V4":10, "V5":11, "V6":12}'))
+lead_index = os.getenv("LEAD_INDEX", "I,II,III,aVL,aVR,aVF,V1,V2,V3,V4,V5,V6").split(",")
 
+# ---------------------- ECG PLOTTING ----------------------
 def plot_ecg_multilead(
-        ecg, 
-        full_ecg_name,        # changed to let us have (or don't have) full ecg in the printed format
-        full_ecg,             # changed
-        
-        sample_rate    = 500, 
-        title          = 'ECG 12', 
-        lead_index     = lead_index, 
-        lead_order     = None,
-        style          = None,
-        columns        = 2,
-        row_height     = 6,
-        show_lead_name = True,
-        show_grid      = True,
-        show_separate_line  = True,
+        ecg,
+        full_ecg_name,
+        full_ecg,
+        sample_rate=500,
+        title='ECG 12',
+        lead_index=lead_index,
+        lead_order=None,
+        style=None,
+        columns=2,
+        row_height=6,
+        show_lead_name=True,
+        show_grid=True,
+        show_separate_line=True,
         save_path: str = None,
-        dpi:int = None,
-        ):
-    """Plot multi lead ECG chart.
-    # Arguments
-        ecg        : m x n ECG signal data, which m is number of leads and n is length of signal.
-        full_ecg_name: the name of the full ecg. if `None`, then no full lead wil be printed completely.
-        full_ecg   : signal of the lead that you want to be printed completely. It works if full_ecg_name is assigned
-        
-        sample_rate: Sample rate of the signal.
-        title      : Title which will be shown on top off chart
-        lead_index : Lead name array in the same order of ecg, will be shown on 
-            left of signal plot, defaults to ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
-        lead_order : Lead display order 
-        columns    : display columns, defaults to 2
-        style      : display style, defaults to None, can be 'bw' which means black white
-        row_height :   how many grid should a lead signal have,
-        show_lead_name : show lead name
-        show_grid      : show grid
-        show_separate_line  : show separate line
-        save_path : refers to the save path. if equals to None, it won't save the result. otherwise it saves the result in the defined path
+        dpi: int = None,
+    ):
+    """
+    Plot multi-lead ECG chart.
+
+    Args:
+        ecg: m x n ECG signal data (m: leads, n: signal length)
+        full_ecg_name: name of the full ECG (optional)
+        full_ecg: signal for the full ECG (optional)
+        sample_rate: sampling rate (default 500)
+        title: plot title
+        lead_index: list of lead names
+        lead_order: order of leads to display
+        columns: number of columns in plot
+        row_height: vertical grid height per lead
+        show_lead_name: display lead names
+        show_grid: display grid
+        show_separate_line: display separating lines
+        save_path: if set, save figure to this path
+        dpi: figure DPI
+        style: plot style ('bw', 'binary', or None)
+    Returns:
+        output_log: dict with plotting info and bounding boxes
     """
     horizontal_scale = 0.2 #s
     vertical_scale = 0.5 #mv
@@ -229,31 +227,31 @@ def plot_ecg_multilead(
     return output_log   
 
 
+# ---------------------- FIGURE SAVING ----------------------
 def save_figure_as_jpg(save_path, dpi):
-    """Plot multi lead ECG chart.
-    # Arguments
-        file_name: file_name
-        path     : path to save image, defaults to current folder
+    """
+    Save the current matplotlib figure as a JPG file.
+
+    Args:
+        save_path: output file path
+        dpi: dots per inch for output image
     """
     plt.ioff()
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0, dpi=dpi)
     plt.close()
 
+# ---------------------- BOUNDING BOX GENERATION ----------------------
+def generate_bounding_boxes(*, sample: dict, mode: str, save_bb_path: str, img_array):
+    """
+    Generate bounding boxes for ECG leads and optionally save to file.
 
-
-
-def generate_bounding_boxes(*, sample: dict, mode:str, save_bb_path: str, img_array):
-    """"
-    Determine the bounding box; it received logs of a sample, but the imgae was loaded before calling this function.
-    Input format: 
-        sample : one of the samples from log file. One sample under logs['samples']
-        mode : the input is from {'load_image', 'online'}. in 'load_image', we load a saved image and get the image array, but in 'online' mode, 
-            we get the image array from an existed plot.
-        save_bb_path : the path and name of the text file which will be saved as label.
-        img_array : the np array of the image in case mode == 'online'
-        
-    output format :
-        List of tuples like: (object_class, x_c, y_c, width, height)
+    Args:
+        sample: sample dictionary from logs
+        mode: 'load_image' or 'online'
+        save_bb_path: output label file path (optional)
+        img_array: image array (used in 'online' mode)
+    Returns:
+        label: list of bounding box tuples or label string
     """
     if mode == 'load_image':
         file_path = sample['save_path']
@@ -344,14 +342,14 @@ def generate_bounding_boxes(*, sample: dict, mode:str, save_bb_path: str, img_ar
 
     return label
 
+# ---------------------- DRAW BOUNDING BOXES ----------------------
 def draw_bb(sample: dict, export_path: str):
     """
-    Draws a green bounding box around the leads of the image.
-    Input format:
-        sample: the dictionary which includes the information of the specified sample
-        export_path: the path to export the output image
-    output:
-        an annotated image to the export path
+    Draw bounding boxes on ECG image and save.
+
+    Args:
+        sample: sample dictionary from logs
+        export_path: output image path
     """
     file_path = sample['save_path']
     img = plt.imread(file_path)
@@ -370,16 +368,19 @@ def draw_bb(sample: dict, export_path: str):
     plt.savefig(export_path, dpi=300)
     plt.close()
 
-def crop_lead_images(sample:dict, export_path:str, img_path:str, prefix:str="", smaple_number:int=None, save_bmp:bool=False):
+def crop_lead_images(sample: dict, export_path: str, img_path: str, prefix: str = "", smaple_number: int = None, save_bmp: bool = False):
     """
-    Loads an image using img_path. Then, finds the leads using sample, crops them and saves it to the export path
-    Input format:
-        sample: the dictionary which includes the information of the specified sample
-        export_path: the path to export the output image
-        img_path: path to the image that should be cropped
-        smaple_number: if this parameter set, it just apply the procedure on one of the leads
-    output:
-        cropped images saved in the export path
+    Crop individual lead images from an ECG image.
+
+    Args:
+        sample: sample dictionary from logs
+        export_path: directory to save cropped images
+        img_path: path to source ECG image
+        prefix: filename prefix for output
+        smaple_number: if set, only crop this lead
+        save_bmp: if True, save as BMP (binary mask)
+    Returns:
+        out: list of cropped PIL images
     """
     file_path = sample['save_path']
     img = plt.imread(file_path)
@@ -423,6 +424,17 @@ def crop_lead_images(sample:dict, export_path:str, img_path:str, prefix:str="", 
 
 
 def generate_split_indices(start_index, lead_config, number_each_lead):
+    """
+    Generate indices for dataset splits.
+
+    Args:
+        start_index: starting index
+        lead_config: dict of lead configurations
+        number_each_lead: number of samples per lead
+    Returns:
+        out: list of (index, lead_format, config) tuples
+        idx: next available index after split
+    """
     out = []
     idx = start_index
     for i in range(number_each_lead):
@@ -431,12 +443,12 @@ def generate_split_indices(start_index, lead_config, number_each_lead):
             idx += 1
     return out, idx
 
+# ---------------------- MAIN (TESTING) ----------------------
 if __name__ == "__main__":
+    # Example usage: draw bounding boxes on first 4 samples from logs
     log_path = "datasets/image_dataset_v4.0/detection/train/"
     with open(f"{log_path}logs.json", 'r') as f:
         logs = json.load(f)
-    # generate_bounding_boxes(sample=logs['samples'][1], mode='load_image', save_bb_path=None, img_array=None)
     for i in range(4):
         draw_bb(logs['samples'][i], f"{i}.jpg")
-
 
