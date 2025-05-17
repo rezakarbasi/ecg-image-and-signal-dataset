@@ -36,8 +36,6 @@ def parse_args():
         --sample_each_lead_train: Number of samples per lead for training set.
         --sample_each_lead_val:   Number of samples per lead for validation set.
         --sample_each_lead_test:  Number of samples per lead for test set.
-        --padding_x, --padding_y: Padding for bounding boxes.
-        --border:                 Border size for images.
         --row_height:             Height of each ECG row in the image.
         --signal_dataset_path:    Path to save/load processed signal arrays.
         --raw_signal_path:        Path to raw ECG files.
@@ -50,12 +48,6 @@ def parse_args():
                         help="Number of samples per lead for validation set.")
     parser.add_argument('--sample_each_lead_test', type=int, default=get_env_int("SAMPLE_EACH_LEAD_TEST", 2),
                         help="Number of samples per lead for test set.")
-    parser.add_argument('--padding_x', type=int, default=get_env_int("PADDING_X", 30),
-                        help="Horizontal padding for bounding boxes.")
-    parser.add_argument('--padding_y', type=int, default=get_env_int("PADDING_Y", 30),
-                        help="Vertical padding for bounding boxes.")
-    parser.add_argument('--border', type=int, default=get_env_int("BORDER", 34),
-                        help="Border size for images.")
     parser.add_argument('--row_height', type=int, default=get_env_int("ROW_HEIGHT", 3),
                         help="Height of each ECG row in the image.")
     parser.add_argument('--signal_dataset_path', type=str, default=get_env_str("SIGNAL_DATASET_PATH", "data/signals"),
@@ -245,12 +237,13 @@ if __name__ == "__main__":
     # Load configuration from environment or arguments
     SAMPLING_RATE = get_env_int("SAMPLING_RATE", 100)
     DPI = get_env_int("DPI", 700)
+    PADDING_X = get_env_int("PADDING_X", 30)
+    PADDING_Y = get_env_int("PADDING_Y", 30)
+    BORDER = get_env_int("BORDER", 34)
+    
     SAMPLE_EACH_LEAD_TRAIN = args.sample_each_lead_train
     SAMPLE_EACH_LEAD_VAL = args.sample_each_lead_val
     SAMPLE_EACH_LEAD_TEST = args.sample_each_lead_test
-    PADDING_X = args.padding_x
-    PADDING_Y = args.padding_y
-    BORDER = args.border
     ROW_HEIGHT = args.row_height
 
     LEAD_INDEX = get_env_list("LEAD_INDEX", "I,II,III,aVL,aVR,aVF,V1,V2,V3,V4,V5,V6")
