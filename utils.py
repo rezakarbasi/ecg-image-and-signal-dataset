@@ -33,6 +33,16 @@ def plot_ecg_multilead(
         show_separate_line=True,
         save_path: str = None,
         dpi: int = None,
+
+        horizontal_scale = 0.2, # s
+        vertical_scale = 0.5, # mv
+
+        fontsize = 6,
+
+        n_empty_cell_at_left = 3.25,    # number of empty cells at left
+        n_empty_cell_at_right = 3,      # number of empty cells at right
+        n_empty_cell_at_up = 6,         # number of empty cells at up
+        n_empty_cell_at_down = 6,       # number of empty cells at down
     ):
     """
     Plot multi-lead ECG chart.
@@ -56,11 +66,6 @@ def plot_ecg_multilead(
     Returns:
         output_log: dict with plotting info and bounding boxes
     """
-    horizontal_scale = 0.2 #s
-    vertical_scale = 0.5 #mv
-
-    fontsize = 6
-
     num_columns = columns
     num_rows = len(ecg)//num_columns
 
@@ -68,11 +73,6 @@ def plot_ecg_multilead(
     xrange_full = np.arange(full_ecg.shape[0])/sample_rate/horizontal_scale
     range_horizontal = xrange_signals[-1] + 0.2
     # range_vertical = 6
-
-    n_empty_cell_at_left = 3.25   # number of free cells at the least left
-    n_empty_cell_at_right = 3 
-    n_empty_cell_at_up = 6
-    n_empty_cell_at_down = 6
 
     x_min = -n_empty_cell_at_left
     y_min = -n_empty_cell_at_down

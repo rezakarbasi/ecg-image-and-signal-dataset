@@ -56,6 +56,17 @@ def parse_args():
                         help="Path to raw ECG files.")
     parser.add_argument('--datasets_path', type=str, default=get_env_str("DATASETS_PATH", "data/datasets"),
                         help="Output directory for generated datasets.")
+    
+    parser.add_argument('--horizontal_scale', type=float, default=0.2, help="Horizontal scale of the image in s.")
+    parser.add_argument('--vertical_scale', type=float, default=0.5, help="Vertical scale of the image in mV.")
+    parser.add_argument('--fontsize', type=float, default=6, help="Font size of of the lead name.")
+    parser.add_argument('--n_empty_cell_at_left', type=float, default=3.25, help="Number of empty cells to put in left.")
+    parser.add_argument('--n_empty_cell_at_right', type=float, default=3, help="Number of empty cells to put in right.")
+    parser.add_argument('--n_empty_cell_at_up', type=float, default=6, help="Number of empty cells to put in up.")
+    parser.add_argument('--n_empty_cell_at_down', type=float, default=6, help="Number of empty cells to put in down.")
+    parser.add_argument('--show_lead_name', type=float, default=1, help="Show the lead text (1) or not (0).")
+    parser.add_argument('--show_grid', type=float, default=1, help="Show the grid (1) or not (0).")
+    parser.add_argument('--show_separate_line', type=float, default=1, help="Show the separate line (1) or not (0)")
     return parser.parse_args()
 
 # ---------------------- Utility Functions ----------------------
@@ -114,8 +125,9 @@ def prepare_directories(dataset_root, detection_dir, segmentation_dir, temp_dir)
 def process_sample(
     sample_idx, lead_format, lead_cfg, signals, sampling_rate, row_height, 
     lead_names, detection_dir, segmentation_dir, temp_dir, 
-    padding_x, padding_y, border, dpi
-):
+    padding_x, padding_y, border, dpi, horizontal_scale, vertical_scale,fontsize,
+    n_empty_cell_at_left, n_empty_cell_at_right, n_empty_cell_at_up,
+    n_empty_cell_at_down, show_lead_name, show_grid, show_separate_line):
     """
     Process a single ECG sample: generate images, masks, bounding boxes, and signal JSONs.
 
@@ -154,13 +166,21 @@ def process_sample(
         lead_index=lead_names,
         title='',
         lead_order=lead_cfg['lead_order'],
-        show_lead_name=False,
-        show_grid=True,
-        show_separate_line=False,
+        show_lead_name=show_lead_name,
+        show_grid=show_grid,
+        show_separate_line=show_separate_line,
         row_height=row_height,
         style=None,
         save_path=detection_image_path,
-        dpi=dpi
+        dpi=dpi,
+
+        horizontal_scale = horizontal_scale,
+        vertical_scale = vertical_scale,
+        fontsize = fontsize,
+        n_empty_cell_at_left = n_empty_cell_at_left,
+        n_empty_cell_at_right = n_empty_cell_at_right,
+        n_empty_cell_at_up = n_empty_cell_at_up,
+        n_empty_cell_at_down = n_empty_cell_at_down,
     )
     log['padding_x'] = padding_x
     log['padding_y'] = padding_y
@@ -203,7 +223,15 @@ def process_sample(
             row_height=row_height,
             style='binary',
             save_path=temp_bw_path,
-            dpi=dpi
+            dpi=dpi,
+
+            horizontal_scale=horizontal_scale,
+            vertical_scale=vertical_scale,
+            fontsize=fontsize,
+            n_empty_cell_at_left=n_empty_cell_at_left,
+            n_empty_cell_at_right=n_empty_cell_at_right,
+            n_empty_cell_at_up=n_empty_cell_at_up,
+            n_empty_cell_at_down=n_empty_cell_at_down,
         )
         fig = plt.gcf()
         fig.canvas.draw()
@@ -240,11 +268,22 @@ if __name__ == "__main__":
     PADDING_X = get_env_int("PADDING_X", 30)
     PADDING_Y = get_env_int("PADDING_Y", 30)
     BORDER = get_env_int("BORDER", 34)
-    
+
     SAMPLE_EACH_LEAD_TRAIN = args.sample_each_lead_train
     SAMPLE_EACH_LEAD_VAL = args.sample_each_lead_val
     SAMPLE_EACH_LEAD_TEST = args.sample_each_lead_test
     ROW_HEIGHT = args.row_height
+
+    horizontal_scale = args.horizontal_scale
+    vertical_scale = args.vertical_scale
+    fontsize = args.fontsize
+    n_empty_cell_at_left = args.n_empty_cell_at_left
+    n_empty_cell_at_right = args.n_empty_cell_at_right
+    n_empty_cell_at_up = args.n_empty_cell_at_up
+    n_empty_cell_at_down = args.n_empty_cell_at_down
+    show_lead_name = args.show_lead_name
+    show_grid = args.show_grid
+    show_separate_line = args.show_separate_line
 
     LEAD_INDEX = get_env_list("LEAD_INDEX", "I,II,III,aVL,aVR,aVF,V1,V2,V3,V4,V5,V6")
     LEAD_DISPLAY = get_env_list("LEAD_DISPLAY", "I,II,III,aVR,aVL,aVF,V1,V2,V3,V4,V5,V6")
@@ -311,7 +350,9 @@ if __name__ == "__main__":
             log = process_sample(
                 idx, lead_format, lead_cfg, signals, SAMPLING_RATE, ROW_HEIGHT, LEAD_INDEX,
                 detection_export_path, segmentation_export_path, temp_dir,
-                PADDING_X, PADDING_Y, BORDER, DPI
+                PADDING_X, PADDING_Y, BORDER, DPI, horizontal_scale, vertical_scale,
+                fontsize, n_empty_cell_at_left, n_empty_cell_at_right, n_empty_cell_at_up,
+                n_empty_cell_at_down, show_lead_name, show_grid, show_separate_line
             )
             logs[split_name].append(log)
 
