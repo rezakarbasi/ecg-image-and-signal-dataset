@@ -143,4 +143,4 @@ Feel free to open an issue or discussion if you need help.
 
 For questions, please contact:
 - Masoud Rahimi: mr.rahimi39@ut.ac.ir
-- Reza Karbasi: rezakarbasi@ut.ac.ir
+- Reza Karbasi: arzkarbasi@gmail.com
