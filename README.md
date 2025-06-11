@@ -5,7 +5,7 @@ This repository provides an open-source Python framework for generating customiz
 The dataset for waveform segmentation is provided in two versions: normal and overlapping. In the overlapping version, signals from adjacent leads (above or below) are superimposed onto a target lead. At the same time, the corresponding masks remain clean, containing only the true waveform of the target lead.
 
 More information on our paper.
-- Paper: should be added after publication.
+- Paper: https://doi.org/10.48550/arXiv.2506.06315
 - Datasets: [https://doi.org/10.5281/zenodo.15484519](https://doi.org/10.5281/zenodo.15484519)
 
 ---
