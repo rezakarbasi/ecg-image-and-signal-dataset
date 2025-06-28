@@ -14,7 +14,7 @@ More information on our paper.
 If you use this dataset or code, please cite both the dataset and the paper:
 
 **Paper:**  
-*To be added after publication.*
+> Rahimi, Masoud, Reza Karbasi, and Abdol-Hossein Vahabie. "An open-source python framework and synthetic ecg image datasets for digitization, lead and lead name detection, and overlapping signal segmentation." arXiv preprint arXiv:2506.06315 (2025).
 
 **Dataset:**
 > Rahimi, M., Karbasi, R., & Vahabie, A. H. (2025). *An Open-Source Python Framework and Synthetic ECG Image Datasets for Digitization, Lead and Lead Name Detection, and Overlapping Signal Segmentation*. University of Tehran.
