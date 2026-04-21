@@ -5,7 +5,7 @@ This repository provides an open-source Python framework for generating customiz
 The dataset for waveform segmentation is provided in two versions: normal and overlapping. In the overlapping version, signals from adjacent leads (above or below) are superimposed onto a target lead. At the same time, the corresponding masks remain clean, containing only the true waveform of the target lead.
 
 More information on our paper.
-- Paper at Journal of Medical Signals & Sensors: [[https://doi.org/10.5281/zenodo.15484519](https://journals.lww.com/jmss/fulltext/2026/03300/synthecg__python_framework_and_ecg_image_datasets.3.aspx)](https://doi.org/10.5281/zenodo.15484519)
+- Paper at Journal of Medical Signals & Sensors:[https://journals.lww.com/jmss/fulltext/2026/03300/synthecg__python_framework_and_ecg_image_datasets.3.aspx](SynthECG: Python Framework and ECG Image Datasets for Digitization, Lead Detection, and Waveform Segmentation)
 - Datasets at Zenodo: [https://doi.org/10.5281/zenodo.15484519](https://doi.org/10.5281/zenodo.15484519)
 - Open-source code at GitHub: [https://github.com/rezakarbasi/ecg-image-and-signal-dataset](https://github.com/rezakarbasi/ecg-image-and-signal-dataset)  
 
