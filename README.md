@@ -5,8 +5,9 @@ This repository provides an open-source Python framework for generating customiz
 The dataset for waveform segmentation is provided in two versions: normal and overlapping. In the overlapping version, signals from adjacent leads (above or below) are superimposed onto a target lead. At the same time, the corresponding masks remain clean, containing only the true waveform of the target lead.
 
 More information on our paper.
-- Paper: https://doi.org/10.48550/arXiv.2506.06315
-- Datasets: [https://doi.org/10.5281/zenodo.15484519](https://doi.org/10.5281/zenodo.15484519)
+- Paper at Journal of Medical Signals & Sensors: [[https://doi.org/10.5281/zenodo.15484519](https://journals.lww.com/jmss/fulltext/2026/03300/synthecg__python_framework_and_ecg_image_datasets.3.aspx)](https://doi.org/10.5281/zenodo.15484519)
+- Datasets at Zenodo: [https://doi.org/10.5281/zenodo.15484519](https://doi.org/10.5281/zenodo.15484519)
+- Open-source code at GitHub: [https://github.com/rezakarbasi/ecg-image-and-signal-dataset](https://github.com/rezakarbasi/ecg-image-and-signal-dataset)  
 
 ---
 
@@ -14,14 +15,10 @@ More information on our paper.
 If you use this dataset or code, please cite both the dataset and the paper:
 
 **Paper:**  
-> Rahimi, Masoud, Reza Karbasi, and Abdol-Hossein Vahabie. "An open-source python framework and synthetic ecg image datasets for digitization, lead and lead name detection, and overlapping signal segmentation." arXiv preprint arXiv:2506.06315 (2025).
+> Rahimi, Masoud*; Karbasi, Reza*; Vahabie, Abdol-Hossein. SynthECG: Python Framework and ECG Image Datasets for Digitization, Lead Detection, and Waveform Segmentation. Journal of Medical Signals & Sensors 16(3):8, March 2026. | DOI: 10.4103/jmss.jmss_58_25
 
 **Dataset:**
 > Rahimi, M., Karbasi, R., & Vahabie, A. H. (2025). *An Open-Source Python Framework and Synthetic ECG Image Datasets for Digitization, Lead and Lead Name Detection, and Overlapping Signal Segmentation*. University of Tehran.
-
-Dataset at Zenodo: [https://doi.org/10.5281/zenodo.15484519](https://doi.org/10.5281/zenodo.15484519)
-
-code at GitHub: [https://github.com/rezakarbasi/ecg-image-and-signal-dataset](https://github.com/rezakarbasi/ecg-image-and-signal-dataset)  
 
 
 ---
