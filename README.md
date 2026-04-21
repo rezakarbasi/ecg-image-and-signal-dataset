@@ -45,24 +45,26 @@ If you use this dataset or code, please cite both the dataset and the paper:
 | Segmentation (Normal)      | Cropped leads + masks + ground truth signals    | 20,000      |
 | Segmentation (Overlapping) | Overlapping leads + clean masks                 | 102         |
 
+### Dataset Samples
+
 <p align="center">
   <figure>
-    <img src="images/image1.png" width="600">
-    <figcaption><b>Figure 1:</b> Sample from the ECG Digitization dataset.</figcaption>
+    <img src="images/figure 1.jpg" width="600">
+    <figcaption><b>Figure 1:</b> Lead & Lead Name Detection dataset: ECG images annotated with bounding boxes for lead regions and lead names. The color of each box indicates the class ID. Class 0 corresponds to lead waveform regions, whereas classes 1 to 12 represent the lead names I, II, III, aVR, aVL, aVF, and V1–V6, respectively. The bounding boxes for lead names are notably smaller than those for the waveform regions. </figcaption>
   </figure>
 </p>
 
 <p align="center">
   <figure>
-    <img src="images/image2.png" width="600">
-    <figcaption><b>Figure 2:</b> Sample from the Lead & Lead Name Detection dataset (YOLO annotations).</figcaption>
+    <img src="images/figure 2.jpg" width="600">
+    <figcaption><b>Figure 2:</b> Illustration of the YOLO bounding box format, which includes the class ID, normalized center coordinates (x, y), and the bounding box width and height (w, h), all expressed relative to the image dimensions. </figcaption>
   </figure>
 </p>
 
 <p align="center">
   <figure>
-    <img src="images/image3.png" width="600">
-    <figcaption><b>Figure 3:</b> Sample from the Segmentation dataset (normal or overlapping).</figcaption>
+    <img src="images/figure 3.jpg" width="600">
+    <figcaption><b>Figure 3:</b> Normal and overlapping segmentation dataset: Top – Single-lead ECG image with its corresponding mask shown on the right. Middle and bottom – Overlapping single-lead ECG images with clean masks displayed on the right. masks are in U-Net format</figcaption>
   </figure>
 </p>
 
