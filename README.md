@@ -53,6 +53,7 @@ If you use this dataset or code, please cite both the dataset and the paper:
     <figcaption><b>Figure 1:</b> Lead & Lead Name Detection dataset: ECG images annotated with bounding boxes for lead regions and lead names. The color of each box indicates the class ID. Class 0 corresponds to lead waveform regions, whereas classes 1 to 12 represent the lead names I, II, III, aVR, aVL, aVF, and V1–V6, respectively. The bounding boxes for lead names are notably smaller than those for the waveform regions. </figcaption>
   </figure>
 </p>
+<br><br>
 
 <p align="center">
   <figure>
@@ -60,6 +61,7 @@ If you use this dataset or code, please cite both the dataset and the paper:
     <figcaption><b>Figure 2:</b> Illustration of the YOLO bounding box format, which includes the class ID, normalized center coordinates (x, y), and the bounding box width and height (w, h), all expressed relative to the image dimensions. </figcaption>
   </figure>
 </p>
+<br><br>
 
 <p align="center">
   <figure>
